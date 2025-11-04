@@ -611,4 +611,5 @@ def main():
         print("мяу, готово (=^..^=)")
         return
 
-main()
+if __name__ == "__main__":
+    main()
