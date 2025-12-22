@@ -44,7 +44,7 @@ def rayleigh_quotient(A: np.ndarray, x: np.ndarray, ops=None):
     num = _dot_with_ops(Ax, x, ops)
     den = _dot_with_ops(x, x, ops)
     if den == 0.0:
-        raise _err("в отношении Рэлея (x,x)=0 — нельзя")
+        raise _err("в отношении Рэлея (x,x)=0 - неуютно")
     _ops_inc(ops, "div")
     return num / den
 def gershgorin_disks(A: np.ndarray):
@@ -117,9 +117,11 @@ def power_plain(A_in, x0: Vec,
 
     ops_iter = _ops_zero()
 
-    x_old = _as_array_v(x0).astype(float).copy()
+    # вот фикс: приводим тут x0 к вектору длины n
+    x_old = np.asarray(_as_array_v(x0), dtype=float).reshape(-1).copy()
     if x_old.shape != (n,):
         raise _err("x0 должен иметь размерность (n,)")
+
     if _vnorm(x_old, "2") == 0.0:
         raise _err("x0 не должен быть нулевым")
 
@@ -213,9 +215,11 @@ def power_normalized(A_in, x0: Vec,
 
     ops_iter = _ops_zero()
 
-    x_old = _as_array_v(x0).astype(float).copy()
+    # и вот фикс - тоже приводим тут x0 к вектору длины n (=^..^=)
+    x_old = np.asarray(_as_array_v(x0), dtype=float).reshape(-1).copy()
     if x_old.shape != (n,):
         raise _err("x0 должен иметь размерность (n,)")
+
     nx = _vnorm(x_old, "2")
     if nx == 0.0:
         raise _err("x0 не должен быть нулевым")
@@ -416,7 +420,7 @@ def main():
 
         n = Aarr.shape[0]
         display(Markdown("выбираем x0: `ones` / `rand` / `e1`..`en`"))
-        x0_kind = input("x0 kind → ").strip() or "rand"
+        x0_kind = input(f"x0 kind (`ones` / `rand` / `e1`..`e{n}`) → ").strip() or "rand"
         x0 = make_x0_eig(x0_kind, n, seed=42)
 
         display(Markdown(
@@ -455,7 +459,7 @@ def main():
         A = make_symmetric_with_spectrum(lambdas, seed=seed)
 
         display(Markdown("выбираем x0: `ones` / `rand` / `e1`..`en` (по умолчанию rand)"))
-        x0_kind = input("x0 kind → ").strip() or "rand"
+        x0_kind = input(f"x0 kind (`ones` / `rand` / `e1`..`e{n}`) → ").strip() or "rand"
         x0 = make_x0_eig(x0_kind, n, seed=seed+1)
 
         display(Markdown(
@@ -472,6 +476,7 @@ def main():
         return
 
     print("мяу мяу, выбери 1/2/3")
+
 
 if __name__ == "__main__":
     main()
